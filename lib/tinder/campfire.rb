@@ -38,6 +38,12 @@ module Tinder
       rooms.detect { |room| room.name == name }
     end
 
+    # Find a campfire room by id
+    def find_room_by_id(id)
+      id = id.to_i
+      rooms.detect { |room| room.id == id }
+    end
+
     # Find a campfire room by its guest hash
     def find_room_by_guest_hash(hash, name)
       rooms.detect { |room| room.guest_invite_code == hash }
