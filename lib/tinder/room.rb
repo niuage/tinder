@@ -86,20 +86,21 @@ module Tinder
     end
 
     # Get the list of users currently chatting for this room
-    def users
-      reload!
+    def users(reload = true)
+      reload! if reload
       @users
     end
 
     # return the user with the given id; if it isn't in our room cache, do a request to get it
     def user(id)
       if id
-        user = users.detect {|u| u[:id] == id }
+        @all_users ||= users;
+        user = @all_users.detect {|u| u[:id] == id }
         unless user
           user_data = connection.get("/users/#{id}.json")
           user = user_data && user_data[:user]
+          @all_users << user
         end
-        user[:created_at] = Time.parse(user[:created_at])
         user
       end
     end
@@ -190,6 +191,11 @@ module Tinder
     # Get the list of latest files for this room
     def files(count = 5)
       get(:uploads)['uploads'].map { |u| u['full_url'] }
+    end
+
+    def recent_messages
+      url = "/room/#{@id}/recent.json"
+      connection.get(url)["messages"]
     end
 
   protected
